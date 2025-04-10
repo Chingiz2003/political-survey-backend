@@ -29,8 +29,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
-        // Проверяем путь более точно и учитываем метод запроса
-        return path.equals("/api/auth/login") || path.startsWith("/api/face/verify");
+        // Пропускаем auth пути и admin пути
+        return path.equals("/api/auth/login") ||
+                path.startsWith("/api/face/verify") ||
+                path.startsWith("/api/admin/");
     }
 
     @Override

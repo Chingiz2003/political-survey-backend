@@ -30,5 +30,4 @@ public class AnswerOption {
     @OneToMany(mappedBy = "selectedAnswer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Vote> votes;
 
-
 }

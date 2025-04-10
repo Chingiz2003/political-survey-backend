@@ -1,6 +1,7 @@
 package com.politicalsurvey.backend.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,8 @@ public class Vote {
     @JoinColumn(name = "citizen_id", nullable = false)
     private Citizen citizen;
 
-    @OneToOne(mappedBy = "vote", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "vote", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonIgnore
     private BlockchainRecord blockchainRecord;
 }
 

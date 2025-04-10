@@ -15,13 +15,14 @@ public class AdminDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        System.out.println("Попытка входа с username: " + username);
         var admin = adminRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Admin not found"));
+                .orElseThrow(() -> {
+                    System.out.println("Админ с username " + username + " не найден");
+                    return new UsernameNotFoundException("Admin not found");
+                });
 
-        return User.builder()
-                .username(admin.getUsername())
-                .password("{noop}" + admin.getPassword()) // Для теста, без шифрования
-                .roles("ADMIN")
-                .build();
+        System.out.println("Админ найден: " + admin.getUsername());
+        return new AdminDetails(admin);
     }
 }

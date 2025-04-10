@@ -1,5 +1,6 @@
 package com.politicalsurvey.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -35,13 +36,15 @@ public class Poll {
     @Column(nullable = false)
     private boolean anonymous;
 
-    @Column(nullable = false)
-    private UUID adminId;
+    @ManyToOne
+    @JoinColumn(name = "admin_id", nullable = false)
+    private Admin admin;
 
     @OneToMany(mappedBy = "poll", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Question> questions;
 
-    @OneToOne(mappedBy = "poll", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "poll", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonIgnore
     private BlockchainRecord blockchainRecord;
 
     @OneToMany(mappedBy = "poll", cascade = CascadeType.ALL, orphanRemoval = true)

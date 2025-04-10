@@ -1,5 +1,6 @@
 package com.politicalsurvey.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -30,12 +31,14 @@ public class BlockchainRecord {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vote_id", unique = true)
+    @JsonIgnore
     private Vote vote;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "poll_id", unique = true)
+    @JsonIgnore
     private Poll poll;
 
     public enum RecordType {
