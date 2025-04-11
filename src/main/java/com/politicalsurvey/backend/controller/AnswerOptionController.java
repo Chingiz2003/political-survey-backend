@@ -1,5 +1,6 @@
 package com.politicalsurvey.backend.controller;
 
+import com.politicalsurvey.backend.DTO.AnswerOptionDto;
 import com.politicalsurvey.backend.entity.AnswerOption;
 import com.politicalsurvey.backend.service.AnswerOptionService;
 import org.springframework.web.bind.annotation.*;
@@ -17,14 +18,18 @@ public class AnswerOptionController {
     }
 
     @GetMapping("/question/{questionId}")
-    public List<AnswerOption> getAnswerOptionsByQuestion(@PathVariable UUID questionId) {
-        return answerOptionService.getAnswerOptionsByQuestion(questionId);
+    public List<AnswerOptionDto> getAnswerOptionsByQuestion(@PathVariable UUID questionId) {
+        return answerOptionService.getAnswerOptionsByQuestion(questionId).stream()
+                .map(opt -> new AnswerOptionDto(opt.getId(), opt.getText(), opt.getOrderIndex(), opt.getQuestion().getId()))
+                .toList();
     }
 
+
     @PostMapping
-    public AnswerOption createAnswerOption(@RequestBody AnswerOption answerOption) {
-        return answerOptionService.createAnswerOption(answerOption);
+    public AnswerOption createAnswerOption(@RequestBody AnswerOptionDto dto) {
+        return answerOptionService.createAnswerOption(dto);
     }
+
 
     @DeleteMapping("/{id}")
     public void deleteAnswerOption(@PathVariable UUID id) {

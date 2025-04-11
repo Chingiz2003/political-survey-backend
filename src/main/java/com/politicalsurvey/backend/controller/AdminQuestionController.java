@@ -1,5 +1,6 @@
 package com.politicalsurvey.backend.controller;
 
+import com.politicalsurvey.backend.DTO.QuestionDto;
 import com.politicalsurvey.backend.entity.Poll;
 import com.politicalsurvey.backend.entity.Question;
 import com.politicalsurvey.backend.repository.PollRepository;
@@ -25,18 +26,44 @@ public class AdminQuestionController {
         this.questionRepository = questionRepository;
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<List<QuestionDto>> getAllQuestions() {
+        List<QuestionDto> dtos = questionRepository.findAll().stream()
+                .map(q -> {
+                    QuestionDto dto = new QuestionDto();
+                    dto.setText(q.getText());
+                    dto.setQuestionType(q.getQuestionType().name());
+                    dto.setId(q.getId());
+                    return dto;
+                })
+                .toList();
+
+        return ResponseEntity.ok(dtos);
+    }
+
+
+
     @PostMapping("/create")
     public ResponseEntity<?> createQuestion(
             @RequestParam("pollId") UUID pollId,
-            @RequestBody Question question
+            @RequestBody QuestionDto dto
     ) {
         Poll poll = pollRepository.findById(pollId)
                 .orElseThrow(() -> new RuntimeException("Poll not found"));
 
+        Question question = new Question();
+        question.setText(dto.getText());
         question.setPoll(poll);
-        Question saved = questionRepository.save(question);
 
-        return ResponseEntity.ok(saved);
+        try {
+            Question.QuestionType type = Question.QuestionType.valueOf(dto.getQuestionType()); // Преобразование строки в enum
+            question.setQuestionType(type);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Неверный тип вопроса: " + dto.getQuestionType());
+        }
+
+        return ResponseEntity.ok(questionRepository.save(question));
     }
+
 }
 
