@@ -9,6 +9,7 @@ import com.politicalsurvey.backend.repository.QuestionRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class PublicPollService {
@@ -41,7 +42,7 @@ public class PublicPollService {
                 qDto.setQuestionType(q.getQuestionType().name());
 
                 List<AnswerOptionDto> options = q.getAnswerOptions().stream()
-                        .map(opt -> new AnswerOptionDto(opt.getId(), opt.getText(), opt.getOrderIndex()))
+                        .map(opt -> new AnswerOptionDto(opt.getId(), opt.getText(), opt.getOrderIndex(), q.getId()))
                         .toList();
                 qDto.setOptions(options);
 
@@ -52,5 +53,36 @@ public class PublicPollService {
             return dto;
         }).toList();
     }
+
+    public PollResponseDto getPollById(UUID pollId) {
+        return pollRepository.findById(pollId)
+                .map(poll -> {
+                    PollResponseDto dto = new PollResponseDto();
+                    dto.setId(poll.getId());
+                    dto.setTitle(poll.getTitle());
+                    dto.setDescription(poll.getDescription());
+                    dto.setAnonymous(poll.isAnonymous());
+                    dto.setStatus(poll.getStatus().name());
+
+                    List<QuestionResponseDto> questionDtos = poll.getQuestions().stream().map(q -> {
+                        QuestionResponseDto qDto = new QuestionResponseDto();
+                        qDto.setId(q.getId());
+                        qDto.setText(q.getText());
+                        qDto.setQuestionType(q.getQuestionType().name());
+
+                        List<AnswerOptionDto> options = q.getAnswerOptions().stream()
+                                .map(opt -> new AnswerOptionDto(opt.getId(), opt.getText(), opt.getOrderIndex(), q.getId()))
+                                .toList();
+                        qDto.setOptions(options);
+
+                        return qDto;
+                    }).toList();
+
+                    dto.setQuestions(questionDtos);
+                    return dto;
+                })
+                .orElseThrow(() -> new RuntimeException("Опрос не найден"));
+    }
+
 }
 

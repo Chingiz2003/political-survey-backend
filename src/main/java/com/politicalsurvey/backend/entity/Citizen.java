@@ -31,7 +31,6 @@ public class Citizen {
     @Column(name = "nationality", nullable = false, length = 50)
     private String nationality; // Гражданство (например, "Казахстан")
 
-    // Важно! Удаляем @Lob и устанавливаем columnDefinition="bytea"
     @Column(name = "face_image", nullable = false, columnDefinition = "bytea")
     private byte[] faceImage; // Фото лица пользователя (хранится как bytea в PostgreSQL)
 }
