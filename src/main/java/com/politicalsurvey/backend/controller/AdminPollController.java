@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin/polls")
@@ -76,6 +77,21 @@ public class AdminPollController {
                 .toList();
 
         return ResponseEntity.ok(result);
+    }
+
+    @PutMapping("/close/{pollId}")
+    public ResponseEntity<?> closePoll(@PathVariable UUID pollId) {
+        Poll poll = pollRepository.findById(pollId)
+                .orElseThrow(() -> new RuntimeException("Опрос не найден"));
+
+        if (poll.getStatus() != Poll.PollStatus.ACTIVE) {
+            return ResponseEntity.badRequest().body("Опрос не активен и не может быть завершён");
+        }
+
+        poll.setStatus(Poll.PollStatus.CLOSED);
+        pollRepository.save(poll);
+
+        return ResponseEntity.ok("Опрос успешно завершён");
     }
 
 

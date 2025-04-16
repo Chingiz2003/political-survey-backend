@@ -7,10 +7,14 @@ import com.politicalsurvey.backend.entity.Citizen;
 import com.politicalsurvey.backend.entity.Question;
 import com.politicalsurvey.backend.entity.Vote;
 import com.politicalsurvey.backend.repository.AnswerOptionRepository;
+import com.politicalsurvey.backend.repository.CitizenRepository;
 import com.politicalsurvey.backend.repository.QuestionRepository;
 import com.politicalsurvey.backend.repository.VoteRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class VoteService {
@@ -18,13 +22,16 @@ public class VoteService {
     private final VoteRepository voteRepository;
     private final QuestionRepository questionRepository;
     private final AnswerOptionRepository answerOptionRepository;
+    private final CitizenRepository citizenRepository;
 
     public VoteService(VoteRepository voteRepository,
                        QuestionRepository questionRepository,
-                       AnswerOptionRepository answerOptionRepository) {
+                       AnswerOptionRepository answerOptionRepository,
+                       CitizenRepository citizenRepository) {
         this.voteRepository = voteRepository;
         this.questionRepository = questionRepository;
         this.answerOptionRepository = answerOptionRepository;
+        this.citizenRepository = citizenRepository;
     }
 
     @Transactional
@@ -49,4 +56,16 @@ public class VoteService {
             voteRepository.save(vote);
         }
     }
+
+    public boolean hasCitizenVoted(Integer citizenId, UUID questionId) {
+        return voteRepository.existsByCitizenIdAndQuestionId(citizenId, questionId);
+    }
+
+    public List<UUID> getVotedQuestionIds(Integer citizenId) {
+        return voteRepository.findByCitizenId(citizenId).stream()
+                .map(vote -> vote.getQuestion().getId())
+                .distinct()
+                .toList();
+    }
+
 }

@@ -10,4 +10,6 @@ import java.util.UUID;
 @Repository
 public interface VoteRepository extends JpaRepository<Vote, UUID> {
     List<Vote> findBySelectedAnswer_Id(UUID answerId);
+    boolean existsByCitizenIdAndQuestionId(Integer citizenId, UUID questionId);
+    List<Vote> findByCitizenId(Integer citizenId);
 }
