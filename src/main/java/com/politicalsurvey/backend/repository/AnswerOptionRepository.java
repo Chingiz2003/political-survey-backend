@@ -10,4 +10,6 @@ import java.util.UUID;
 @Repository
 public interface AnswerOptionRepository extends JpaRepository<AnswerOption, UUID> {
     List<AnswerOption> findByQuestionId(UUID questionId); // Получить все варианты по ID вопроса
+    List<AnswerOption> findByQuestionIdIn(List<UUID> questionIds);
+
 }

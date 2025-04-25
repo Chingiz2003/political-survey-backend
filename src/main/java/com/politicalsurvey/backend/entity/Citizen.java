@@ -33,4 +33,8 @@ public class Citizen {
 
     @Column(name = "face_image", nullable = false, columnDefinition = "bytea")
     private byte[] faceImage; // Фото лица пользователя (хранится как bytea в PostgreSQL)
+
+    @Column(nullable = false)
+    private boolean hasCompletedIntroSurvey = false;
+
 }

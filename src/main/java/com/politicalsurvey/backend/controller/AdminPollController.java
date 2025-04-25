@@ -3,6 +3,7 @@ package com.politicalsurvey.backend.controller;
 import com.politicalsurvey.backend.DTO.PollDto;
 import com.politicalsurvey.backend.entity.Admin;
 import com.politicalsurvey.backend.entity.Poll;
+import com.politicalsurvey.backend.entity.Question;
 import com.politicalsurvey.backend.repository.PollRepository;
 import com.politicalsurvey.backend.security.AdminDetails;
 import jakarta.transaction.Transactional;
@@ -93,6 +94,62 @@ public class AdminPollController {
 
         return ResponseEntity.ok("Опрос успешно завершён");
     }
+
+
+    @PutMapping("/publish/{pollId}")
+    public ResponseEntity<?> publishPoll(@PathVariable UUID pollId) {
+        Poll poll = pollRepository.findById(pollId)
+                .orElseThrow(() -> new RuntimeException("Опрос не найден"));
+
+        // Форсированная загрузка answerOptions
+        poll.getQuestions().forEach(q -> q.getAnswerOptions().size());
+
+        boolean hasValidStructure = poll.getQuestions().stream().allMatch(q ->
+                q.getQuestionType() == Question.QuestionType.TEXT ||
+                        (q.getAnswerOptions() != null && !q.getAnswerOptions().isEmpty())
+        );
+
+        if (!hasValidStructure) {
+            return ResponseEntity.badRequest().body("Опрос не завершён");
+        }
+
+        poll.setPublished(true);
+        poll.setStatus(Poll.PollStatus.ACTIVE);
+        pollRepository.save(poll);
+
+        return ResponseEntity.ok("Опрос опубликован");
+    }
+
+    @PutMapping("/{pollId}")
+    public ResponseEntity<?> updatePoll(@PathVariable UUID pollId, @RequestBody PollDto dto) {
+        Poll poll = pollRepository.findById(pollId)
+                .orElseThrow(() -> new RuntimeException("Опрос не найден"));
+
+        if (poll.getStatus() == Poll.PollStatus.CLOSED) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Опрос завершён и не может быть отредактирован");
+        }
+
+        poll.setTitle(dto.getTitle());
+        poll.setDescription(dto.getDescription());
+        poll.setAnonymous(dto.isAnonymous());
+
+        return ResponseEntity.ok(pollRepository.save(poll));
+    }
+
+    @DeleteMapping("/{pollId}")
+    public ResponseEntity<?> deletePoll(@PathVariable UUID pollId) {
+        Poll poll = pollRepository.findById(pollId).orElseThrow(() -> new RuntimeException("Опрос не найден"));
+
+        if (poll.getStatus() == Poll.PollStatus.CLOSED) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Нельзя удалить завершённый опрос");
+        }
+
+        pollRepository.deleteById(pollId);
+        return ResponseEntity.ok("Опрос удален");
+    }
+
+
+
 
 
 

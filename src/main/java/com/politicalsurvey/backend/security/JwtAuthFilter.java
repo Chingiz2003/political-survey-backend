@@ -32,7 +32,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         // Пропускаем auth пути и admin пути
         return path.equals("/api/auth/login") ||
                 path.startsWith("/api/face/verify") ||
-                path.startsWith("/api/admin/");
+                path.startsWith("/api/admin/") ||
+                path.startsWith("/api/intro-survey/") ||
+                path.startsWith("/api/recommendation/");
     }
 
     @Override

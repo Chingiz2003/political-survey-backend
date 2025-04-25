@@ -36,6 +36,9 @@ public class Poll {
     @Column(nullable = false)
     private boolean anonymous;
 
+    @Column(nullable = false)
+    private boolean published = false;
+
     @ManyToOne
     @JoinColumn(name = "admin_id", nullable = false)
     private Admin admin;

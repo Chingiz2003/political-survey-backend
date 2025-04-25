@@ -6,6 +6,7 @@ import com.politicalsurvey.backend.entity.Question;
 import com.politicalsurvey.backend.repository.PollRepository;
 import com.politicalsurvey.backend.repository.QuestionRepository;
 import com.politicalsurvey.backend.service.QuestionService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,12 +35,14 @@ public class AdminQuestionController {
                     dto.setText(q.getText());
                     dto.setQuestionType(q.getQuestionType().name());
                     dto.setId(q.getId());
+                    dto.setPollId(q.getPoll().getId()); //добавили pollId
                     return dto;
                 })
                 .toList();
 
         return ResponseEntity.ok(dtos);
     }
+
 
 
 
@@ -64,6 +67,71 @@ public class AdminQuestionController {
 
         return ResponseEntity.ok(questionRepository.save(question));
     }
+
+    @GetMapping("/by-poll/{pollId}")
+    public ResponseEntity<List<QuestionDto>> getQuestionsByPoll(@PathVariable UUID pollId) {
+        List<QuestionDto> dtos = questionRepository.findByPollId(pollId).stream()
+                .map(q -> {
+                    QuestionDto dto = new QuestionDto();
+                    dto.setId(q.getId());
+                    dto.setText(q.getText());
+                    dto.setQuestionType(q.getQuestionType().name());
+                    dto.setPollId(q.getPoll().getId()); // получение опросов по id
+                    return dto;
+                })
+                .toList();
+
+        return ResponseEntity.ok(dtos);
+    }
+
+
+//    @PutMapping("/update/{questionId}")
+//    public ResponseEntity<?> updateQuestion(@PathVariable UUID questionId, @RequestBody QuestionDto dto) {
+//        Question question = questionRepository.findById(questionId)
+//                .orElseThrow(() -> new RuntimeException("Вопрос не найден"));
+//
+//        if (question.getPoll().getStatus() == Poll.PollStatus.CLOSED) {
+//            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+//                    .body("Нельзя редактировать вопрос завершённого опроса");
+//        }
+//
+//        question.setText(dto.getText());
+//        question.setQuestionType(Question.QuestionType.valueOf(dto.getQuestionType()));
+//        questionRepository.save(question);
+//
+//        return ResponseEntity.ok("Вопрос успешно обновлён");
+//    }
+
+    @PutMapping("/{questionId}")
+    public ResponseEntity<?> updateQuestion(@PathVariable UUID questionId, @RequestBody QuestionDto dto) {
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new RuntimeException("Вопрос не найден"));
+
+        if (question.getPoll().getStatus() == Poll.PollStatus.CLOSED) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Опрос завершён и вопрос не может быть отредактирован");
+        }
+
+        question.setText(dto.getText());
+        question.setQuestionType(Question.QuestionType.valueOf(dto.getQuestionType()));
+
+        return ResponseEntity.ok(questionRepository.save(question));
+    }
+
+    @DeleteMapping("/{questionId}")
+    public ResponseEntity<?> deleteQuestion(@PathVariable UUID questionId) {
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new RuntimeException("Вопрос не найден"));
+
+        if (question.getPoll().getStatus() == Poll.PollStatus.CLOSED) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Опрос завершён, удаление вопроса невозможно");
+        }
+
+        questionRepository.deleteById(questionId);
+        return ResponseEntity.ok("Вопрос успешно удалён");
+    }
+
+
 
 }
 

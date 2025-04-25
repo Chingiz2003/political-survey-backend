@@ -3,6 +3,8 @@ package com.politicalsurvey.backend.service;
 import com.politicalsurvey.backend.DTO.AnswerOptionDto;
 import com.politicalsurvey.backend.DTO.PollPublic.PollResponseDto;
 import com.politicalsurvey.backend.DTO.PollPublic.QuestionResponseDto;
+import com.politicalsurvey.backend.entity.Poll;
+import com.politicalsurvey.backend.entity.Question;
 import com.politicalsurvey.backend.repository.AnswerOptionRepository;
 import com.politicalsurvey.backend.repository.PollRepository;
 import com.politicalsurvey.backend.repository.QuestionRepository;
@@ -27,32 +29,45 @@ public class PublicPollService {
     }
 
     public List<PollResponseDto> getAllPollsWithQuestionsAndOptions() {
-        return pollRepository.findAll().stream().map(poll -> {
-            PollResponseDto dto = new PollResponseDto();
-            dto.setId(poll.getId());
-            dto.setTitle(poll.getTitle());
-            dto.setDescription(poll.getDescription());
-            dto.setAnonymous(poll.isAnonymous());
-            dto.setStatus(poll.getStatus().name());
+        return pollRepository.findAll().stream()
+                .filter(poll ->
+                        poll.isPublished() &&
+                                (poll.getStatus() == Poll.PollStatus.ACTIVE || poll.getStatus() == Poll.PollStatus.CLOSED) &&
+                                poll.getQuestions() != null &&
+                                !poll.getQuestions().isEmpty() &&
+                                poll.getQuestions().stream().allMatch(q ->
+                                        q.getQuestionType() == Question.QuestionType.TEXT ||
+                                                (q.getAnswerOptions() != null && !q.getAnswerOptions().isEmpty())
+                                )
+                )
+                .map(poll -> {
+                    PollResponseDto dto = new PollResponseDto();
+                    dto.setId(poll.getId());
+                    dto.setTitle(poll.getTitle());
+                    dto.setDescription(poll.getDescription());
+                    dto.setAnonymous(poll.isAnonymous());
+                    dto.setStatus(poll.getStatus().name());
 
-            List<QuestionResponseDto> questionDtos = poll.getQuestions().stream().map(q -> {
-                QuestionResponseDto qDto = new QuestionResponseDto();
-                qDto.setId(q.getId());
-                qDto.setText(q.getText());
-                qDto.setQuestionType(q.getQuestionType().name());
+                    List<QuestionResponseDto> questionDtos = poll.getQuestions().stream().map(q -> {
+                        QuestionResponseDto qDto = new QuestionResponseDto();
+                        qDto.setId(q.getId());
+                        qDto.setText(q.getText());
+                        qDto.setQuestionType(q.getQuestionType().name());
 
-                List<AnswerOptionDto> options = q.getAnswerOptions().stream()
-                        .map(opt -> new AnswerOptionDto(opt.getId(), opt.getText(), opt.getOrderIndex(), q.getId()))
-                        .toList();
-                qDto.setOptions(options);
+                        List<AnswerOptionDto> options = q.getAnswerOptions().stream()
+                                .map(opt -> new AnswerOptionDto(opt.getId(), opt.getText(), opt.getOrderIndex(), q.getId()))
+                                .toList();
+                        qDto.setOptions(options);
 
-                return qDto;
-            }).toList();
+                        return qDto;
+                    }).toList();
 
-            dto.setQuestions(questionDtos);
-            return dto;
-        }).toList();
+                    dto.setQuestions(questionDtos);
+                    return dto;
+                }).toList();
     }
+
+
 
     public PollResponseDto getPollById(UUID pollId) {
         return pollRepository.findById(pollId)

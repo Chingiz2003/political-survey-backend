@@ -28,6 +28,11 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
+	implementation 'com.theokanning.openai-gpt3-java:client:0.12.0'
+	implementation 'org.web3j:core:4.10.3' // или последняя доступная версия
+	implementation 'org.slf4j:slf4j-api:2.0.9'
+	runtimeOnly 'ch.qos.logback:logback-classic:1.4.14'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'

@@ -33,11 +33,22 @@ public class PollService {
         poll.setDescription(pollDetails.getDescription());
         poll.setStatus(pollDetails.getStatus());
         poll.setAnonymous(pollDetails.isAnonymous());
+        validatePollCompleteness(poll);
         return pollRepository.save(poll);
     }
 
     public void deletePoll(UUID id) {
         pollRepository.deleteById(id);
+    }
+
+    public void validatePollCompleteness(Poll poll) {
+        boolean hasQuestions = poll.getQuestions() != null && !poll.getQuestions().isEmpty();
+        boolean allHaveOptions = hasQuestions && poll.getQuestions().stream()
+                .allMatch(q -> q.getAnswerOptions() != null && !q.getAnswerOptions().isEmpty());
+
+        if (!hasQuestions || !allHaveOptions) {
+            poll.setStatus(Poll.PollStatus.DRAFT);
+        }
     }
 }
 

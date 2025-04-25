@@ -10,4 +10,5 @@ public class QuestionDto {
     private UUID id;
     private String text;
     private String questionType; // Строка из фронта: "SINGLE_CHOICE", "TEXT", и т.д.
+    private UUID pollId;
 }

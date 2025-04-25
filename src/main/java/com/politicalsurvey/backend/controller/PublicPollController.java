@@ -1,6 +1,7 @@
 package com.politicalsurvey.backend.controller;
 
 import com.politicalsurvey.backend.DTO.PollPublic.PollResponseDto;
+import com.politicalsurvey.backend.entity.CitizenProfile;
 import com.politicalsurvey.backend.entity.Poll;
 import com.politicalsurvey.backend.entity.Question;
 import com.politicalsurvey.backend.entity.Vote;
