@@ -39,6 +39,12 @@ public class CitizenProfileService {
         profile.setVolunteerWillingness(dto.getVolunteerWillingness());
         profile.setInfoSource(dto.getInfoSource());
         profile.setCivicParticipation(dto.getCivicParticipation());
+        profile.setTrustLevel(dto.getTrustLevel());
+        profile.setGovernanceStyle(dto.getGovernanceStyle());
+        profile.setEmigrationIntent(dto.getEmigrationIntent());
+        profile.setNationalPride(dto.getNationalPride());
+        profile.setCultureImportance(dto.getCultureImportance());
+
 
         citizenProfileRepository.save(profile);
 

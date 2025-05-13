@@ -69,7 +69,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/face/**", "/api/auth/**", "/api/intro-survey/**", "/api/recommendation/**").permitAll()
+                        .requestMatchers("/api/face/**", "/api/auth/**", "/api/intro-survey/**", "/api/recommendation/**", "/api/summary/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

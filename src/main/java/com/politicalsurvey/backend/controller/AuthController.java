@@ -59,6 +59,7 @@ public class AuthController {
 
             Map<String, Object> response = new HashMap<>();
             response.put("token", token);
+            response.put("citizenId", citizen.getId()); 
             response.put("citizen", Map.of(
                     "id", citizen.getId(),
                     "fullName", citizen.getFullName(),

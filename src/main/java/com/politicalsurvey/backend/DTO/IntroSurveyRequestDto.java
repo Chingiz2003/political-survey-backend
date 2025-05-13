@@ -19,4 +19,10 @@ public class IntroSurveyRequestDto {
     private String volunteerWillingness;
     private String infoSource;
     private String civicParticipation;
+    private String trustLevel;
+    private String governanceStyle;
+    private String emigrationIntent;
+    private String nationalPride;
+    private String cultureImportance;
+
 }

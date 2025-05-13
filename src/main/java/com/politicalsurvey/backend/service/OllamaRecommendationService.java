@@ -32,26 +32,41 @@ public class OllamaRecommendationService {
 
     private String buildPrompt(CitizenProfile profile, String pollTitle, List<String> options) {
         return """
-                Гражданин прошёл вводный опрос. Его профиль:
-                — Специализация: %s
-                — Политические взгляды: %s
-                — Основные проблемы: %s
-                — Желаемые изменения: %s
+Гражданин прошёл вводный опрос. Его профиль:
+— Сфера деятельности: %s
+— Политические взгляды: %s
+— Предпочитаемый стиль управления: %s
+— Уровень доверия к государственным институтам: %s
+— Намерение уехать из Казахстана: %s
+— Гордость за гражданство: %s
+— Отношение к культуре и языку: %s
+— Основные проблемы: %s
+— Желаемые изменения: %s
 
-                Ему показан опрос: "%s"
-                С такими вариантами ответов: %s
+Ему показан опрос: "%s"
+С такими вариантами ответов:
+- %s
 
-                На основе профиля, предложи самый подходящий вариант ответа и обоснуй рекомендацию.
-                Ответ должен быть кратким и понятным пользователю.
-                """.formatted(
+Сформируй ответ на **русском литературном языке**. Избегай использования иностранных слов и сокращений.
+
+Ответ должен быть в следующем формате:
+— Рекомендуемый вариант: [название]
+— Обоснование: [краткое объяснение, почему этот вариант соответствует взглядам гражданина]
+""".formatted(
                 profile.getSpecialization(),
                 profile.getIdeology(),
+                profile.getGovernanceStyle(),
+                profile.getTrustLevel(),
+                profile.getEmigrationIntent(),
+                profile.getNationalPride(),
+                profile.getCultureImportance(),
                 profile.getPriorityIssues(),
                 profile.getDesiredChanges(),
                 pollTitle,
-                options
+                String.join("\n- ", options)
         );
     }
+
 
     private String extractContent(String json) {
         try {
